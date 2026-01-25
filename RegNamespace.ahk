@@ -1,7 +1,4 @@
 #Requires AutoHotkey v2.0.0+
-ProgramFilesDir := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVe2rsion", "ProgramFilesDir")
-MsgBox "Program files are in: " ProgramFilesDir
-
 ;==============================================================
 ; RegNamespace — Registry namespace helper with optional subkeys and RegView switching
 ;
