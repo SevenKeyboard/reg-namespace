@@ -1,4 +1,7 @@
 #Requires AutoHotkey v2.0.0+
+ProgramFilesDir := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVe2rsion", "ProgramFilesDir")
+MsgBox "Program files are in: " ProgramFilesDir
+
 ;==============================================================
 ; RegNamespace — Registry namespace helper with optional subkeys and RegView switching
 ;
@@ -16,16 +19,20 @@ class VersionManager_RegNamespace
 }
 class RegNamespace
 {
-    __new(rootPath, regView := "Default")    {
+    __new(rootPath, regView := "Default", readOnly := false)    {
         this._rootPath := rTrim(rootPath, "\")
         if (this._rootPath == "")
             throw valueError("Parameter #1 cannot be an empty string.", -1)
         this._regView := (regView == 32 ? 32 : regView == 64 ? 64 : "Default")
+        this._readOnly := (!!readOnly)
     }
     RootPath    => this._rootPath
     RegView     => this._regView
+    ReadOnly    => this._readOnly
     ;---------------------------------------
     createKey(subKey?)    {
+        if (this._readOnly)
+            throw error("Cannot create registry keys from a read-only instance.")
         if (A_RegView !== this._regView)
             prevRegView := setRegView(this._regView)
         try regCreateKey(this._resolveKeyPath(subKey?))
@@ -37,6 +44,8 @@ class RegNamespace
         }
     }
     delete(subKey?, valueName?)    {
+        if (this._readOnly)
+            throw error("Cannot delete registry keys or values from a read-only instance.")
         if (A_RegView !== this._regView)
             prevRegView := setRegView(this._regView)
         try regDelete(this._resolveKeyPath(subKey?), valueName?)
@@ -48,6 +57,8 @@ class RegNamespace
         }
     }
     deleteKey(subKey?)    {
+        if (this._readOnly)
+            throw error("Cannot delete registry keys from a read-only instance.")
         if (A_RegView !== this._regView)
             prevRegView := setRegView(this._regView)
         try regDeleteKey(this._resolveKeyPath(subKey?))
@@ -71,6 +82,8 @@ class RegNamespace
         return value
     }
     write(value, valueType, subKey?, valueName?)    {
+        if (this._readOnly)
+            throw error("Cannot write registry keys or values from a read-only instance.")
         if (A_RegView !== this._regView)
             prevRegView := setRegView(this._regView)
         try regWrite(value, valueType, this._resolveKeyPath(subKey?), valueName?)
