@@ -16,11 +16,12 @@ class VersionManager_RegNamespace
 }
 class RegNamespace
 {
-    __new(rootPath, regView := "Default")    {
+    __new(rootPath, regView := "Default", readOnly := false)    {
         this._rootPath := rTrim(rootPath, "\")
         if (this._rootPath == "")
             throw "Parameter #1 cannot be an empty string."
         this._regView := (regView == 32 ? 32 : regView == 64 ? 64 : "Default")
+        this._readOnly := (!!readOnly)
     }
     RootPath    {
         get  {
@@ -32,8 +33,18 @@ class RegNamespace
             return this._regView
         }
     }
+    ReadOnly    {
+        get  {
+            return this._readOnly
+        }
+    }
     ;---------------------------------------
     createKey(subKey := "UNSET_SUBKEY_7C99F0B4")    {
+        local
+        if (this._readOnly)    {
+            errorLevel := 1
+            return
+        }
         if (A_RegView !== this._regView)    {
             prevRegView := A_RegView
             setRegView % this._regView
@@ -52,6 +63,10 @@ class RegNamespace
     }
     delete(subKey := "UNSET_SUBKEY_7C99F0B4", valueName := "UNSET_VALUENAME_0777A948")    {
         local
+        if (this._readOnly)    {
+            errorLevel := 1
+            return
+        }
         if (A_RegView !== this._regView)    {
             prevRegView := A_RegView
             setRegView % this._regView
@@ -64,6 +79,10 @@ class RegNamespace
     }
     deleteKey(subKey := "UNSET_SUBKEY_7C99F0B4")    {
         local
+        if (this._readOnly)    {
+            errorLevel := 1
+            return
+        }
         if (A_RegView !== this._regView)    {
             prevRegView := A_RegView
             setRegView % this._regView
@@ -91,6 +110,10 @@ class RegNamespace
     }
     write(value, valueType, subKey := "UNSET_SUBKEY_7C99F0B4", valueName := "")    {
         local
+        if (this._readOnly)    {
+            errorLevel := 1
+            return
+        }
         if (A_RegView !== this._regView)    {
             prevRegView := A_RegView
             setRegView % this._regView
