@@ -11,7 +11,7 @@ class VersionManager_RegNamespace
     static _ := this._init()
     static _init()    {
         global
-        REGNAMESPACE_VERSION := "1.0.1"
+        REGNAMESPACE_VERSION := "1.0.2"
     }
 }
 class RegNamespace
