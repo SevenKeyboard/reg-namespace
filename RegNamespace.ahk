@@ -11,7 +11,7 @@ class VersionManager_RegNamespace
     static _ := VersionManager_RegNamespace._init()
     _init()    {
         global
-        REGNAMESPACE_VERSION := "1.0.1"
+        REGNAMESPACE_VERSION := "1.0.2"
     }
 }
 class RegNamespace
@@ -50,21 +50,23 @@ class RegNamespace
             setRegView % this._regView
         }
         keyPath := this._resolveKeyPath(subKey)
+        ok := true
         try regRead _, % keyPath
         catch
-            errorLevel := 1
-        if (errorLevel)    {
+            ok := false
+        if (!ok)    {
+            ok := true
             try regWrite % "REG_SZ", % keyPath,, % ""
             catch
-                errorLevel := 1
-            if (!errorLevel)    {
+                ok := false
+            if (ok)    {
+                ok := true
                 try regDelete % keyPath, % chr(0x0041) . chr(0x0048) . chr(0x004B) . "_" . chr(0x0044) . chr(0x0045) . chr(0x0046) . chr(0x0041) . chr(0x0055) . chr(0x004C) . chr(0x0054)
                 catch
-                    errorLevel := 1
+                    ok := false
             }
-        }  else  {
-            errorLevel := 0
         }
+        errorLevel := !ok
         if (isSet(prevRegView))
             setRegView % prevRegView
     }
@@ -80,9 +82,11 @@ class RegNamespace
         }
         if (valueName == "" || valueName == "UNSET_VALUENAME_0777A948")
             valueName := chr(0x0041) . chr(0x0048) . chr(0x004B) . "_" . chr(0x0044) . chr(0x0045) . chr(0x0046) . chr(0x0041) . chr(0x0055) . chr(0x004C) . chr(0x0054)
+        ok := true
         try regDelete % this._resolveKeyPath(subKey), % valueName
         catch
-            errorLevel := 1
+            ok := false
+        errorLevel := !ok
         if (isSet(prevRegView))
             setRegView % prevRegView
     }
@@ -96,9 +100,11 @@ class RegNamespace
             prevRegView := A_RegView
             setRegView % this._regView
         }
+        ok := true
         try regDelete % this._resolveKeyPath(subKey)
         catch
-            errorLevel := 1
+            ok := false
+        errorLevel := !ok
         if (isSet(prevRegView))
             setRegView % prevRegView
     }
@@ -108,15 +114,17 @@ class RegNamespace
             prevRegView := A_RegView
             setRegView % this._regView
         }
+        ok := true
         try regRead value, % this._resolveKeyPath(subKey), % valueName
         catch
-            errorLevel := 1
-        if (errorLevel)    {
+            ok := false
+        if (!ok)    {
             if (default !== "UNSET_DEFAULT_B861760B")    {
                 value := default
-                errorLevel := 0
+                ok := true
             }
         }
+        errorLevel := !ok
         if (isSet(prevRegView))
             setRegView % prevRegView
         return value
@@ -131,9 +139,11 @@ class RegNamespace
             prevRegView := A_RegView
             setRegView % this._regView
         }
+        ok := true
         try regWrite % valueType, % this._resolveKeyPath(subKey), % valueName, % value
         catch
-            errorLevel := 1
+            ok := false
+        errorLevel := !ok
         if (isSet(prevRegView))
             setRegView % prevRegView
     }
